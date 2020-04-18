@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Clientes</h1>
+
+    <a href="{% url 'transactions:new_client' %}" class="btn btn-primary">Novo Cliente</a>
+
+    <hr>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Telefone</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for client in clients %}            
+                <tr>
+                    <td scope="row"><a href="{% url 'transactions:view_client' client.id %}">{{ client.name }}</a></td>
+                    <td>{{ client.phone }}</td>
+                    <td>
+                        <form action="{% url 'transactions:delete_client' client.id %}" method="POST">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Excluir</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock content %}

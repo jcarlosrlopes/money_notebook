@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Sistema de controle de Vales</h1>
+
+    <h3>Vales mais antigos</h3>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Cliente</th>
+                <th>Valor Atual</th>
+                <th>Última despesa</th>
+                <th>Data</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for vale in transactions %}
+            <tr>
+                <td scope="row">{{ vale.client.name }}</td>
+                <td>{{ vale.value }}</td>
+                <td>{{ vale.value }}</td>
+                <td>{{ vale.created_at }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock content %}
