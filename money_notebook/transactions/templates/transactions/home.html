@@ -3,7 +3,7 @@
 {% block content %}
     <h1>Sistema de controle de Vales</h1>
 
-    <h3>Vales mais antigos</h3>
+    <h3 class="my-5">Vales mais antigos</h3>
 
     <table class="table">
         <thead>
@@ -20,7 +20,7 @@
                 <td scope="row">{{ vale.client.name }}</td>
                 <td>{{ vale.value }}</td>
                 <td>{{ vale.value }}</td>
-                <td>{{ vale.created_at }}</td>
+                <td>{{ vale.created_at|date:'d/m/Y G:i' }}</td>
             </tr>
             {% endfor %}
         </tbody>

@@ -3,7 +3,11 @@
 {% block content %}
     <h1>View Client</h1>
 
-    <p>{{ client.name }}</p>
-    <p>{{ client.telefone }}</p>
+    <div class="col-md-8 mt-5">
+        <p><b>Nome: </b>{{ client.name }}</p>
+        <p><b>Endereço: </b>{{ client.address }}</p>
+        <p><b>CPF: </b>{{ client.cpf }}</p>
+        <p><b>Telefone: </b>{{ client.phone }}</p>
+    </div>
      
 {% endblock content %}

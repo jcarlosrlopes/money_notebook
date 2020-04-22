@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>View Transaction</h1>
+
+    <div class="col-md-8 mt-5">
+        <p><b>Cadastrado por: </b>{{ transaction.responsible }}</p>
+
+        <p><b>Cliente: </b>{{ transaction.client }}</p>
+        <p>
+            <b>Tipo: </b>
+            {{ transaction.transaction_type }}
+        </p>
+    </div>
+     
+{% endblock content %}
