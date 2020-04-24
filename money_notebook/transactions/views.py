@@ -14,21 +14,27 @@ def clients(request):
 
 @login_required
 def new_client(request):
-    if request.method == 'POST':        
-        form = ClientForm(request.POST)
-        form.save()
-        return redirect('transactions:clientes')
+    if request.method == 'POST':
+        try:
+            form = ClientForm(request.POST)
+            form.save()
+            return redirect('transactions:clientes')
+        except ValueError:
+            return render(request, 'transactions/new_update_client.html', { 'form': form })
     else:
         client_form = ClientForm()
-        return render(request, 'transactions/new_update_client.html', { 'form': client_form})
+        return render(request, 'transactions/new_update_client.html', { 'form': client_form })
 
 @login_required
 def update_client(request, client_id):
     client = get_object_or_404(Client,pk=client_id)
     if request.method == 'POST':
-        form = ClientForm(request.POST, instance=client)
-        form.save()
-        return redirect('transactions:clientes')
+        try:
+            form = ClientForm(request.POST, instance=client)
+            form.save()
+            return redirect('transactions:clientes')
+        except ValueError:
+            return render(request, 'transactions/new_update_client.html', { 'form': form })
     else:
         client_form = ClientForm(instance=client)
         return render(request, 'transactions/new_update_client.html', { 'form': client_form, 'client': client })
@@ -58,22 +64,28 @@ def view_transaction(request, transaction_id):
 @login_required
 def new_transaction(request):
     if request.method == 'POST':
-        form = TransactionForm(request.POST)
-        newtransaction = form.save(commit=False)
-        newtransaction.responsible = request.user
-        newtransaction.save()
-        return redirect('transactions:vales')
+        try:
+            form = TransactionForm(request.POST)
+            newtransaction = form.save(commit=False)
+            newtransaction.responsible = request.user
+            newtransaction.save()
+            return redirect('transactions:vales')
+        except ValueError:
+            return render(request, 'transactions/new_update_transaction.html', {'form': form })
     else:
         form = TransactionForm()
-        return render(request, 'transactions/new_update_transaction.html', {'form': form })        
+        return render(request, 'transactions/new_update_transaction.html', {'form': form })
 
 @login_required
 def update_transaction(request, transaction_id):
     transaction = get_object_or_404(Transaction,pk=transaction_id)
     if request.method == 'POST':
-        form = TransactionForm(instance=transaction)
-        form.save()        
-        return redirect('transactions:vales')
+        try:
+            form = TransactionForm(instance=transaction)
+            form.save()        
+            return redirect('transactions:vales')
+        except ValueError:
+            return render(request, 'transactions/new_update_transaction.html', {'form': form })
     else:
         form = TransactionForm(instance=transaction)
         return render(request, 'transactions/new_update_transaction.html', { 'form': form })
