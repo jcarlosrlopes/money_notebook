@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Contas</h1>
+
+    <a href="{% url 'sales:new_account' %}" class="btn btn-primary my-5">Nova Conta</a>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Cliente</th>
+                <th>Valor Total</th>
+                <th>Data de criação</th>                
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for account in accounts %}
+                <tr>
+                    <td scope="row">
+                        <a href="{% url 'sales:view_account' account.id %}">
+                            {{ account.client }}    
+                        </a>
+                    </td>
+                    <td>{{ account.current_value }}</td>
+                    <td>{{ account.created_at|date:'d/m/Y G:i' }}</td>
+                    <td>
+                        <div class="row">
+                        <a href="{% url 'sales:update_account' account.id %}" class="btn btn-primary mr-2">Editar</a>
+                        <form action="{% url 'sales:delete_account' account.id %}" method="POST">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Excluir</button>
+                        </form>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock content %}

@@ -2,6 +2,12 @@
 
 {% block content %}
 
+    {% if form.instance %}
+        <h2>Nova Conta</h2>
+    {% else %}
+        <h2>Atualizar Conta</h2>
+    {% endif %}
+
     <form action="" method="post" novalidate>
         {% csrf_token %}
 

@@ -40,7 +40,7 @@ INSTALLED_APPS = [
 
     'widget_tweaks',
     
-    'transactions',
+    'sales',
 ]
 
 MIDDLEWARE = [
@@ -134,6 +134,6 @@ STATIC_URL = '/static/'
 
 
 LOGIN_URL='/login'
-LOGIN_REDIRECT_URL='transactions:home'
+LOGIN_REDIRECT_URL='sales:home'
 LOGOUT_URL='/logout'
 LOGOUT_REDIRECT_URL = '/login/'
