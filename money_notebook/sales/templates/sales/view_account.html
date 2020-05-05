@@ -17,19 +17,19 @@
 
     <a href="{% url 'sales:new_update_sale' account.id %}" class="btn btn-success">Adicionar Vale</a>
 
-    <h3 class="my-5">Vales</h3>
+    <h3 class="border-bottom border-gray my-3">Vales</h3>
 
     <div class="row">
         
         {% for sale in account.sales.all %}
-            <div class="col-sm-6 col-md-4">
+            <div class="col-sm-6 col-md-4 mb-3">
                 <div class="card">
                     <div class="card-body">
                         <h4 class="card-title">{{ sale.description }}</h4>
                         <p class="card-text">Valor: R$ {{ sale.total_value }}</p>
                     </div>
-                    <div class="card-footer">
-                        <a href="#" class="btn btn-primary">Detalhar</a>
+                    <div class="card-footer text-center">
+                        <a href="{% url 'sales:view_sale' account.id sale.id %}" class="btn btn-primary">Detalhar</a>
                     </div>
                 </div>
             </div>    

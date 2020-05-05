@@ -20,7 +20,7 @@ class OnCreditSaleForm(forms.ModelForm):
 class SaleItemForm(forms.ModelForm):
     class Meta:
         model = SaleItem
-        fields = ['sale', 'quantity', 'description', 'unit_price', 'total_value']
+        fields = ['quantity', 'description', 'unit_price']
 
 class Payment(forms.ModelForm):
     class Meta:

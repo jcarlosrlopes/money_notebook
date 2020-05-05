@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {{ sale }}
+
+    {% for item in sale.items.all %}
+        <p>{{ item.description }}</p>
+        <p>{{ item.total_value }}</p>
+    {% endfor %}
+{% endblock content %}
