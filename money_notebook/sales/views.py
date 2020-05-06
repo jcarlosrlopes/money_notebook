@@ -3,14 +3,14 @@ from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.forms.models import inlineformset_factory
 from django.utils.decorators import method_decorator
-from .models import OnCreditSale, Client, Account, SaleItem
-from .forms import ClientForm, OnCreditSaleForm, AccountForm, SaleItemForm
+from .models import OnCreditSale, ClientAccount, SaleItem
+from .forms import ClientAccountForm, OnCreditSaleForm, SaleItemForm
 from django.urls import reverse_lazy
 
 @method_decorator(login_required, 'dispatch')
 class HomeListView(ListView):    
     template_name = 'sales/home.html'
-    queryset = Account.objects.order_by('-created_at')[:5]
+    queryset = ClientAccount.objects.order_by('-created_at')[:5]
     context_object_name = 'oldest_accounts'
     # oldest_accounts = Account.objects.order_by('-created_at')[:5]
     # return render(request, 'sales/home.html', { 'accounts': oldest_accounts })
@@ -19,25 +19,25 @@ class HomeListView(ListView):
 class ClientsListView(ListView):
     template_name = 'sales/clients.html'
     context_object_name = 'clients'
-    model = Client
+    model = ClientAccount
 
 @login_required
 def new_client(request):
     if request.method == 'POST':
         try:
-            form = ClientForm(request.POST)
+            form = ClientAccountForm(request.POST)
             form.save()
             return redirect('sales:clientes')
         except ValueError:
             return render(request, 'sales/new_update_client.html', { 'form': form })
     else:
-        client_form = ClientForm()
+        client_form = ClientAccountForm()
         return render(request, 'sales/new_update_client.html', { 'form': client_form })
 
 @method_decorator(login_required, 'dispatch')
 class ClientUpdateView(UpdateView):
-    model = Client
-    form_class = ClientForm
+    model = ClientAccount
+    form_class = ClientAccountForm
     template_name = 'sales/new_update_client.html'
     context_object_name = 'client'
     pk_url_kwarg = 'client_id'
@@ -46,25 +46,25 @@ class ClientUpdateView(UpdateView):
     # client = get_object_or_404(Client,pk=client_id)
     # if request.method == 'POST':
     #     try:
-    #         form = ClientForm(request.POST, instance=client)
+    #         form = ClientAccountForm(request.POST, instance=client)
     #         form.save()
     #         return redirect('sales:clientes')
     #     except ValueError:
     #         return render(request, 'sales/new_update_client.html', { 'form': form })
     # else:
-    #     client_form = ClientForm(instance=client)
+    #     client_form = ClientAccountForm(instance=client)
     #     return render(request, 'sales/new_update_client.html', { 'form': client_form, 'client': client })
 
 @method_decorator(login_required, 'dispatch')
 class ClientDetailView(DetailView):
-    model = Client
+    model = ClientAccount
     template_name = 'sales/view_client.html'
     context_object_name = 'client'
     pk_url_kwarg = 'client_id'
 
 @login_required
 def delete_client(request, client_id):
-    client = get_object_or_404(Client, pk=client_id)
+    client = get_object_or_404(ClientAccount, pk=client_id)
     if request.method == 'POST':
         client.delete()
         return redirect('sales:clientes')
@@ -73,11 +73,11 @@ def delete_client(request, client_id):
 class AccountsListView(ListView):
     template_name = 'sales/accounts.html'    
     context_object_name = 'accounts'
-    model = Account
+    model = ClientAccount
 
 @method_decorator(login_required, 'dispatch')
 class AccountDetailView(DetailView):
-    model = Account
+    model = ClientAccount
     template_name = 'sales/view_account.html'
     context_object_name = 'account'
     pk_url_kwarg = 'account_id'
@@ -86,7 +86,7 @@ class AccountDetailView(DetailView):
 def new_account(request):
     if request.method == 'POST':
         try:
-            form = AccountForm(request.POST)
+            form = ClientAccountForm(request.POST)
             newaccount = form.save(commit=False)
             newaccount.created_by = request.user
             newaccount.save()
@@ -94,13 +94,13 @@ def new_account(request):
         except ValueError:
             return render(request, 'sales/new_update_account.html', {'form': form })
     else:
-        form = AccountForm()
+        form = ClientAccountForm()
         return render(request, 'sales/new_update_account.html', {'form': form })
 
 @method_decorator(login_required, 'dispatch')
 class AccountUpdateView(UpdateView):
-    model = Account
-    form_class = AccountForm
+    model = ClientAccount
+    form_class = ClientAccountForm
     template_name = 'sales/new_update_account.html'
     context_object_name = 'account'
     pk_url_kwarg = 'account_id'
@@ -121,14 +121,14 @@ class AccountUpdateView(UpdateView):
 
 @login_required
 def delete_account(request, account_id):
-    account = get_object_or_404(Account, pk=account_id)
+    account = get_object_or_404(ClientAccount, pk=account_id)
     if request.method == 'POST':
         account.delete()
         return redirect('sales:accounts')
 
 @login_required
 def new_update_sale(request, account_id):
-    account = get_object_or_404(Account, pk=account_id)
+    account = get_object_or_404(ClientAccount, pk=account_id)
     SaleItemFormSet = inlineformset_factory(OnCreditSale, SaleItem, form=SaleItemForm, can_delete=False)
     if request.method == 'POST':
         try:            

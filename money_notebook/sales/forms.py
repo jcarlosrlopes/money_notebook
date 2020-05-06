@@ -1,16 +1,11 @@
 from django import forms
-from .models import Client, Account, OnCreditSale, SaleItem, Payment as SalePayment
+from .models import ClientAccount, OnCreditSale, SaleItem, Payment as SalePayment
 
 
-class ClientForm(forms.ModelForm):
+class ClientAccountForm(forms.ModelForm):
     class Meta:
-        model = Client
+        model = ClientAccount
         fields = ['name', 'address', 'cpf', 'phone']
-
-class AccountForm(forms.ModelForm):
-    class Meta:
-        model = Account
-        fields = ['client']
 
 class OnCreditSaleForm(forms.ModelForm):
     class Meta:

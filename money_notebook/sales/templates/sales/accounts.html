@@ -9,6 +9,7 @@
         <thead class="thead-dark">
             <tr>
                 <th>Cliente</th>
+                <th>Telefone</th>
                 <th>Valor Total</th>
                 <th>Data de criação</th>                
                 <th>Ações</th>
@@ -19,9 +20,10 @@
                 <tr>
                     <td scope="row">
                         <a href="{% url 'sales:view_account' account.id %}">
-                            {{ account.client }}    
+                            {{ account.name }}    
                         </a>
                     </td>
+                    <td>{{ account.phone }}</td>
                     <td>{{ account.current_value }}</td>
                     <td>{{ account.created_at|date:'d/m/Y G:i' }}</td>
                     <td>

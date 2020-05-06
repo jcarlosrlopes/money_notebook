@@ -5,8 +5,8 @@ from django.contrib.auth.models import User
 class ClientAccount(models.Model):
     name = models.CharField(max_length=100)
     address = models.CharField(max_length=200, blank=True)
-    cpf = models.BigIntegerField(max_length=11, unique=True)
-    phone = models.BigIntegerField(max_length=11, blank=True, null=True)
+    cpf = models.BigIntegerField(unique=True)
+    phone = models.BigIntegerField(blank=True, null=True)
     created_by = models.ForeignKey(User, on_delete=models.PROTECT, related_name='accounts')
     created_at = models.DateTimeField(auto_now_add=True)
 
