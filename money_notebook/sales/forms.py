@@ -5,7 +5,7 @@ from .models import ClientAccount, OnCreditSale, SaleItem, Payment as SalePaymen
 class ClientAccountForm(forms.ModelForm):
     class Meta:
         model = ClientAccount
-        fields = ['name', 'address', 'cpf', 'phone']
+        fields = ['name', 'address', 'cpf', 'phone', 'limit']
 
 class OnCreditSaleForm(forms.ModelForm):
     class Meta:

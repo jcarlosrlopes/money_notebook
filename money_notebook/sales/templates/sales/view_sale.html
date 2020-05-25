@@ -1,10 +1,26 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    {{ sale }}
 
-    {% for item in sale.items.all %}
-        <p>{{ item.description }}</p>
-        <p>{{ item.total_value }}</p>
-    {% endfor %}
+    <h3 class="mb-3">{{ sale.description }}</h3>    
+
+    <table class="table">
+        <thead class="thead-dark">
+            <th>Descrição</th>
+            <th>Quantidade</th>
+            <th>Preço Unitário</th>
+            <th>Valor Total</th>
+        </thead>
+        <tbody>
+            {% for item in sale.items.all %}
+                <tr>
+                    <td>{{ item.description }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.unit_price }}</td>
+                    <td>{{ item.total_value }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
 {% endblock content %}

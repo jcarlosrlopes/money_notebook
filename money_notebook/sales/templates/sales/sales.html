@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <h1>Vales</h1>
+
+    {% comment %} <a href="{% url 'sales:new_update_sale' 1 %}" class="btn btn-primary my-5">Novo Vale</a> {% endcomment %}
+
+    <table class="table">
+        <thead class="thead-dark">
+            <tr>
+                <th>Description</th>
+                <th>Cliente</th>
+                <th>Total</th>
+                <th>Data de criação</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sale in sales %}            
+                <tr>
+                    <td scope="row"><a href="{% url 'sales:view_sale' sale.account.id sale.id %}">{{ sale.description }}</a></td>
+                    <td>{{ sale.account.name }}</td>
+                    <td>{{ sale.total_value }}</td>
+                    <td>{{ sale.created_at|date:'d/m/Y G:i' }}</td>
+                    <td>
+                        <div class="row">
+                            <a href="{% url 'sales:update_sale' sale.id %}" class="btn btn-primary mr-2">Editar</a>
+                            <a href="{% url 'sales:delete_sale' sale.id %}" class="btn btn-danger mr-2 js-load-form">Excluir</a>                            
+                            {% comment %} <form action="{% url 'sales:delete_sale' sale.id %}" method="POST">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">Excluir</button>
+                            </form> {% endcomment %}
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% include 'includes/pagination.html' %}
+
+{% endblock %}

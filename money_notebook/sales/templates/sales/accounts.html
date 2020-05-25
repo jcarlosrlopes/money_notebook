@@ -11,6 +11,7 @@
                 <th>Cliente</th>
                 <th>Telefone</th>
                 <th>Valor Total</th>
+                <th>Limite</th>
                 <th>Data de criação</th>                
                 <th>Ações</th>
             </tr>
@@ -23,20 +24,26 @@
                             {{ account.name }}    
                         </a>
                     </td>
-                    <td>{{ account.phone }}</td>
-                    <td>{{ account.current_value }}</td>
+                    <td>{{ account.phone|default:'' }}</td>
+                    <td>R$ {{ account.total_value|default_if_none:'0,00' }}</td>
+                    <td>{{ account.limit }}</td>
                     <td>{{ account.created_at|date:'d/m/Y G:i' }}</td>
                     <td>
                         <div class="row">
                         <a href="{% url 'sales:update_account' account.id %}" class="btn btn-primary mr-2">Editar</a>
-                        <form action="{% url 'sales:delete_account' account.id %}" method="POST">
+                        <a href="{% url 'sales:delete_account' account.id %}" class="btn btn-danger mr-2 js-load-form">Excluir</a>
+                        {% comment %} <button class="btn btn-danger" data-toggle="modal" data-target="#exampleModal">Excluir</button> {% endcomment %}
+                        {% comment %} <form action="{% url 'sales:delete_account' account.id %}" method="POST">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-danger">Excluir</button>
-                        </form>
+                        </form> {% endcomment %}
                         </div>
                     </td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
+
+    {% include 'includes/pagination.html' %}
+    
 {% endblock content %}

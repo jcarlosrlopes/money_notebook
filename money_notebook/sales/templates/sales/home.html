@@ -10,19 +10,20 @@
             <tr>
                 <th>Cliente</th>
                 <th>Valor Atual</th>
-                <th>Última despesa</th>
                 <th>Data</th>
             </tr>
         </thead>
         <tbody>
-            {% for vale in sales %}
+            {% for vale in oldest_sales %}
             <tr>
-                <td scope="row">{{ vale.client.name }}</td>
-                <td>{{ vale.value }}</td>
-                <td>{{ vale.value }}</td>
+                <td scope="row">{{ vale.account.name }}</td>
+                <td>R$ {{ vale.total_value }}</td>
                 <td>{{ vale.created_at|date:'d/m/Y G:i' }}</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+
+    {% include 'includes/pagination.html' %}
+
 {% endblock content %}

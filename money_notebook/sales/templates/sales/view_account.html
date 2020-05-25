@@ -3,14 +3,16 @@
 {% block content %}
     <h1>Dados da Conta</h1>
 
-    <div class="row">
-        <div class="col-md-8 mt-5">
-            <p><b>Cadastrado por: </b>{{ account.created_by }}</p>
+    <p><b>Cadastrado por: </b>{{ account.created_by }}</p>
 
-            <p><b>Cliente: </b>{{ account.client }}</p>
+    <div class="row">
+        <div class="col-md-12 mt-5">
+            
+
+            <p><b>Cliente: </b>{{ account.name }}</p>
             <p>
-                <b>Total Atual: </b>
-                {{ account.current_value }}
+                <b>Total: </b>
+                {{ account.total_value }}
             </p>
         </div>
     </div>
@@ -19,8 +21,7 @@
 
     <h3 class="border-bottom border-gray my-3">Vales</h3>
 
-    <div class="row">
-        
+    <div class="row">        
         {% for sale in account.sales.all %}
             <div class="col-sm-6 col-md-4 mb-3">
                 <div class="card">
@@ -30,6 +31,7 @@
                     </div>
                     <div class="card-footer text-center">
                         <a href="{% url 'sales:view_sale' account.id sale.id %}" class="btn btn-primary">Detalhar</a>
+                        <a href="{% url 'sales:update_sale' sale.id %}" class="btn btn-primary">Editar</a>
                     </div>
                 </div>
             </div>    

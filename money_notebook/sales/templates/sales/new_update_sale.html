@@ -6,13 +6,25 @@
 
     <form action="" method="POST">
         {% csrf_token %}
-        {% include 'includes/form.html' with form=sale_form %}
+        {% comment %} {% include 'includes/form.html' with form=sale_form %} {% endcomment %}
+        {% include 'includes/form.html' with form=form %}
 
         <h3>Items</h3>
 
-        {{ formset.management_form }}
-        {% for form in formset %}
-            {% include 'includes/form.html' %}
+        {% comment %} {{ item_formset.management_form }} {% endcomment %}
+        
+        
+        {% comment %} {% for form in item_formset %} {% endcomment %}
+        
+        {% for formset in inlines %}        
+            {{ formset.management_form }}
+            {% for field in formset %}
+                <div class="form-group">
+                    {{ field }} <br>
+                </div>
+            {% endfor %}
+            {% comment %} {{ formset }} {% endcomment %}
+            {% comment %} {% include 'includes/form.html' with form=formset%}             {% endcomment %}
         {% endfor %}
         <button type="submit" class="btn btn-success">Salvar</button>
     </form>
