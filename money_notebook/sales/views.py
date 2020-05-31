@@ -8,8 +8,8 @@ from django.utils.decorators import method_decorator
 from django.urls import reverse_lazy
 from django.db import transaction
 from django.db.models import Sum
-from .models import OnCreditSale, ClientAccount, SaleItem
-from .forms import ClientAccountForm, OnCreditSaleForm, SaleItemForm
+from .models import OnCreditSale, ClientAccount, SaleItem, Payment
+from .forms import ClientAccountForm, OnCreditSaleForm, SaleItemForm, PaymentForm
 from extra_views import CreateWithInlinesView, UpdateWithInlinesView, InlineFormSetFactory
 
 class SaleItemInline(InlineFormSetFactory):
@@ -178,6 +178,45 @@ class SaleCreateView(CreateWithInlinesView):
     fields = ['description', 'receipt']
     template_name = 'sales/new_update_sale.html'
 
+    def dispatch(self, request, *args, **kwargs):
+        # Check permissions for the request.user here
+        if 'account_id' not in kwargs:
+            self.fields = ['account', 'description', 'receipt']
+        return super().dispatch(request, *args, **kwargs)
+
+    # def form_valid(self, form):
+    #     sale = form.save(commit=False)
+    #     sale.created_by = self.request.user
+    #     sale.save()
+
+    #     if formset.is_valid():
+    #         items_form = formset.save(commit=False)
+    #         print(items_form)
+    #         for item in items_form:
+    #             item.total_value = item.quantity * item.unit_price
+    #             sale_total += item.total_value 
+    #             item.save()
+
+    #         sale_update = OnCreditSale.objects.select_for_update().get(pk=sale.id)
+    #         sale_update.total_value = sale_total
+    #         sale_update.save()
+    #     return redirect(reverse('sales:payments',kwargs={ 'sale_id': sale.id }))
+
+    # def get_context_data(self, **kwargs):
+    #     print(kwargs)
+    #     if 'account_id' not in kwargs:
+    #         self.fields = ['account', 'description', 'receipt']
+    #     return super().get_context_data(**kwargs)
+        
+@method_decorator(login_required, 'dispatch')
+class SaleUpdateView(UpdateWithInlinesView):
+    model = OnCreditSale    
+    inlines = [SaleItemInline]
+    template_name = 'sales/new_update_sale.html'
+    pk_url_kwarg = 'sale_id'
+    fields = ['description', 'receipt']
+    success_url = reverse_lazy('sales:sales')
+
 @method_decorator(login_required, 'dispatch')
 class SalesListView(ListView):
     model = OnCreditSale
@@ -207,17 +246,7 @@ class SaleDeleteView(DeleteView):
     template_name = 'sales/delete_sale.html'
     pk_url_kwarg = 'sale_id'
     success_url = reverse_lazy('sales:sales')
-    context_object_name = 'sale'
-
-@method_decorator(login_required, 'dispatch')
-class SaleUpdateView(UpdateWithInlinesView):
-    model = OnCreditSale    
-    inlines = [SaleItemInline]
-    template_name = 'sales/new_update_sale.html'
-    pk_url_kwarg = 'sale_id'
-    fields = ['description', 'receipt']
-    success_url = reverse_lazy('sales:sales')
-
+    context_object_name = 'sale'    
 
     # model = OnCreditSale
     # form_class = OnCreditSaleForm
@@ -312,13 +341,81 @@ class SaleUpdateView(UpdateWithInlinesView):
     # # SaleItemFormSet = inlineformset_factory(OnCreditSale, SaleItem, form=SaleItemForm, can_delete=False)
     # formset = SaleItemFormSet(queryset=SaleItem.objects.none())
 
-@login_required
-def delete_sale(request, sale_id):
-    sale = get_object_or_404(OnCreditSale, pk=sale_id)
-    if request.method == 'POST':
-        sale.delete()
-        return redirect('sales:sales')
+# @login_required
+# def delete_sale(request, sale_id):
+#     sale = get_object_or_404(OnCreditSale, pk=sale_id)
+#     if request.method == 'POST':
+#         sale.delete()
+#         return redirect('sales:sales')
 
 # def view_sale(request, account_id, sale_id):
 #     sale = OnCreditSale.objects.get(pk=sale_id)
 #     return render(request, 'sales/view_sale.html', { 'sale': sale })
+
+@method_decorator(login_required, 'dispatch')
+class PaymentListView(ListView):
+    model = Payment
+    template_name = 'sales/payments.html'
+    context_object_name = 'payments'
+    allow_empty = False
+    paginate_by = 10
+
+    def get_queryset(self):
+        return Payment.objects.filter(sale_id=self.kwargs['sale_id']).order_by('date')    
+    
+@method_decorator(login_required, 'dispatch')
+class PaymentCreateView(CreateView):
+    model = Payment
+    template_name = 'sales/new_update_payment.html'
+    form_class = PaymentForm
+    success_url = reverse_lazy('sales:payments')
+
+    def form_valid(self, form):
+        newpayment = form.save(commit=False)
+        sale = OnCreditSale.objects.get(pk=self.kwargs['sale_id'])
+
+        newpayment.sale = sale
+        newpayment.created_by = self.request.user
+        newpayment.save()
+
+        sale.total_value -= newpayment.value
+        sale.save()
+
+        return redirect(reverse('sales:payments',kwargs={ 'sale_id': sale.id }))
+
+@method_decorator(login_required, 'dispatch')
+class PaymentUpdateView(UpdateView):
+    model = Payment
+    template_name = 'sales/new_update_payment.html'
+    form_class = PaymentForm
+    pk_url_kwarg = 'payment_id'
+    success_url = 'sales:payments'
+
+    def form_valid(self, form):
+        actual_payment = Payment.objects.get(pk=self.kwargs['payment_id'])
+        payment = form.save(commit=False)
+        sale = OnCreditSale.objects.get(pk=self.kwargs['sale_id'])
+        payment.save()
+
+        value_update = actual_payment.value - payment.value
+
+        sale.total_value += value_update        
+        sale.save()
+
+        return redirect(reverse('sales:payments',kwargs={ 'sale_id': sale.id }))
+    
+@method_decorator(login_required, 'dispatch')
+class PaymentDeleteView(DeleteView):
+    model = Payment
+    template_name = 'sales/delete_payment.html'
+    context_object_name = 'payment'
+    success_url = reverse_lazy('sales:sales')
+    pk_url_kwarg = 'payment_id'
+
+    def delete(self, request, *args, **kwargs):
+        sale = OnCreditSale.objects.get(pk=kwargs['sale_id'])
+        self.object = self.get_object()
+        sale.total_value += self.object.value
+        sale.save() 
+
+        return super().delete(request, *args, **kwargs)

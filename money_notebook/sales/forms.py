@@ -17,7 +17,7 @@ class SaleItemForm(forms.ModelForm):
         model = SaleItem
         fields = ['quantity', 'description', 'unit_price']
 
-class Payment(forms.ModelForm):
+class PaymentForm(forms.ModelForm):
     class Meta:
         model = SalePayment
-        fields = ['value', 'date', 'sale']
+        fields = ['description', 'value', 'date']
