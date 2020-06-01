@@ -11,10 +11,12 @@ def create_accounts():
             for i in range(1,11):
                 quantity = random.randint(1,11)
                 price = random.random()*10
-                SaleItem.objects.create(sale=sale, description=f'Item {i} of {sale.description}',quantity=quantity,unit_price=price,total_value=quantity*price)
+                SaleItem.objects.create(sale=sale, description=f'Item {i} of {sale.description}',quantity=quantity,unit_price=price, created_by=user)
 
                 if i % 2 == 0:
                     Payment.objects.create(description=f'Payment {i} of {sale.description}', value=random.randint(1,11), date=datetime.datetime.now(),sale=sale, created_by=user)
+            sale.calculate_total()
+            sale.save()
 
 if __name__ == "__main__":
     create_accounts()

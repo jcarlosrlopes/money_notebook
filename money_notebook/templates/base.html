@@ -12,7 +12,7 @@
   <body>    
     {% block body %}
     
-        <nav class="navbar navbar-expand-lg navbar-light bg-warning">
+        <nav class="navbar navbar-expand-lg navbar-light bg-success">
             <a class="navbar-brand" href="{% url 'sales:home' %}">Caderninho</a>
             <button class="navbar-toggler d-lg-none" type="button" data-toggle="collapse" data-target="#menuPages" aria-controls="menuPages"
                 aria-expanded="false" aria-label="Toggle navigation">
@@ -38,7 +38,7 @@
                         <span class="navbar-text">{{ user.username }}</span>
                     </li>
                     <li class="nav-item">
-                        <a href="{% url 'logout' %}" class="btn btn-outline-danger">
+                        <a href="{% url 'logout' %}" class="nav-link">
                             <i class="fa fa-door"></i>
                             Sair
                         </a>

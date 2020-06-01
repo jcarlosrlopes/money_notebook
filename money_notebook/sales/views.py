@@ -246,8 +246,62 @@ class SaleDeleteView(DeleteView):
     template_name = 'sales/delete_sale.html'
     pk_url_kwarg = 'sale_id'
     success_url = reverse_lazy('sales:sales')
-    context_object_name = 'sale'    
+    context_object_name = 'sale'
 
+@method_decorator(login_required, 'dispatch')
+class SaleItemCreateView(CreateView):
+    model = SaleItem
+    template_name = 'sales/new_update_item.html'
+    form_class = SaleItemForm
+
+    def form_valid(self, form):
+        newsaleitem = form.save(commit=False)
+        sale = OnCreditSale.objects.get(pk=self.kwargs['sale_id'])
+
+        newsaleitem.sale = sale
+        newsaleitem.save()
+
+        sale.calculate_total()
+        sale.save()
+
+        return redirect(reverse('sales:view_sale',kwargs={ 'sale_id': sale.id }))
+
+@method_decorator(login_required, 'dispatch')
+class SaleItemUpdateView(UpdateView):
+    model = SaleItem
+    template_name = 'sales/new_update_item.html'
+    form_class = SaleItemForm
+    pk_url_kwarg = 'item_id'    
+
+    def form_valid(self, form):
+        with transaction.atomic():
+            payment = form.save(commit=False)
+            payment.save()
+           
+            # Update the sale total value
+            sale = OnCreditSale.objects.select_for_update(pk=self.kwargs['sale_id'])
+            sale.calculate_total()
+            sale.save()
+
+        return redirect(reverse('sales:view_sale',kwargs={ 'sale_id': sale.id }))
+
+class SaleItemDeleteView(DeleteView):
+    model = SaleItem
+    template_name = 'sales/delete_item.html'
+    context_object_name = 'item'
+    success_url = reverse_lazy('sales:view_sale')
+    pk_url_kwarg = 'item_id'
+
+    def delete(self, request, *args, **kwargs):
+        with transaction.atomic():
+            super().delete(request, *args, **kwargs)
+
+            # Update the sale total value
+            sale = OnCreditSale.objects.select_for_update(pk=kwargs['sale_id'])
+            sale.calculate_total()
+            sale.save()
+
+        return redirect(self.get_success_url(), kwargs= { 'sale_id': kwargs['sale_id']})
     # model = OnCreditSale
     # form_class = OnCreditSaleForm
 
@@ -378,7 +432,7 @@ class PaymentCreateView(CreateView):
         newpayment.created_by = self.request.user
         newpayment.save()
 
-        sale.total_value -= newpayment.value
+        sale.calculate_total()
         sale.save()
 
         return redirect(reverse('sales:payments',kwargs={ 'sale_id': sale.id }))
@@ -392,15 +446,14 @@ class PaymentUpdateView(UpdateView):
     success_url = 'sales:payments'
 
     def form_valid(self, form):
-        actual_payment = Payment.objects.get(pk=self.kwargs['payment_id'])
-        payment = form.save(commit=False)
-        sale = OnCreditSale.objects.get(pk=self.kwargs['sale_id'])
-        payment.save()
-
-        value_update = actual_payment.value - payment.value
-
-        sale.total_value += value_update        
-        sale.save()
+        with transaction.atomic():
+            payment = form.save(commit=False)
+            payment.save()
+           
+            # Update the sale total value
+            sale = OnCreditSale.objects.select_for_update().get(pk=self.kwargs['sale_id'])
+            sale.calculate_total()
+            sale.save()
 
         return redirect(reverse('sales:payments',kwargs={ 'sale_id': sale.id }))
     
@@ -413,9 +466,12 @@ class PaymentDeleteView(DeleteView):
     pk_url_kwarg = 'payment_id'
 
     def delete(self, request, *args, **kwargs):
-        sale = OnCreditSale.objects.get(pk=kwargs['sale_id'])
-        self.object = self.get_object()
-        sale.total_value += self.object.value
-        sale.save() 
+        with transaction.atomic():
+            super().delete(request, *args, **kwargs)
 
-        return super().delete(request, *args, **kwargs)
+            # Update the sale total value
+            sale = OnCreditSale.objects.select_for_update().get(pk=kwargs['sale_id'])
+            sale.calculate_total()
+            sale.save()
+
+        return redirect(self.get_success_url())
