@@ -6,32 +6,36 @@
 
     <a href="{% url 'sales:new_payment' view.kwargs.sale_id %}" class="btn btn-primary my-5">Novo Pagamento</a>
 
-    <table class="table">
-        <thead class="thead-dark">
-            <tr>
-                <th>Descrição</th>
-                <th>Valor</th>
-                <th>Data</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            {% for payment in payments %}
+    {% if payments %}
+        <table class="table">
+            <thead class="thead-dark">
                 <tr>
-                    <td>{{ payment.description }}</td>
-                    <td>{{ payment.value }}</td>
-                    <td>{{ payment.date|date:'d/M/Y à\s G:i' }} </td>
-                    <td>
-                        <div class="row">                            
-                            <a href="{% url 'sales:update_payment' payment.sale.id payment.id %}" class="btn btn-primary mr-2">Editar</a>
-                            <a href="{% url 'sales:delete_payment' payment.sale.id payment.id %}" class="btn btn-danger js-load-form">Excluir</a>                            
-                        </div>
-                    </td>
+                    <th>Descrição</th>
+                    <th>Valor</th>
+                    <th>Data</th>
+                    <th>Ações</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+
+            <tbody>
+                {% for payment in payments %}
+                    <tr>
+                        <td>{{ payment.description }}</td>
+                        <td>{{ payment.value }}</td>
+                        <td>{{ payment.date|date:'d/M/Y à\s G:i' }} </td>
+                        <td>
+                            <div class="row">                            
+                                <a href="{% url 'sales:update_payment' payment.sale.id payment.id %}" class="btn btn-primary mr-2">Editar</a>
+                                <a href="{% url 'sales:delete_payment' payment.sale.id payment.id %}" class="btn btn-danger js-load-form">Excluir</a>                            
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="text-center">Não há pagamentos para este vale.</p>
+    {% endif %}
 
     {% include 'includes/pagination.html' %}
 

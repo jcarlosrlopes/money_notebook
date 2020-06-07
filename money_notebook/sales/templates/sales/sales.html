@@ -27,7 +27,7 @@
                         <div class="row">
                             <a href="{% url 'sales:payments' sale.id %}" class="btn btn-secondary mr-2">Pagamentos</a>
                             <a href="{% url 'sales:update_sale' sale.id %}" class="btn btn-primary mr-2">Editar</a>
-                            <a href="{% url 'sales:delete_sale' sale.id %}" class="btn btn-danger js-load-form">Excluir</a>                            
+                            <a href="{% url 'sales:delete_sale' sale.id %}" class="btn btn-danger js-load-form">Excluir</a>
                             {% comment %} <form action="{% url 'sales:delete_sale' sale.id %}" method="POST">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-danger">Excluir</button>

@@ -3,7 +3,10 @@
 {% block content %}
 
     <h3 class="mb-3">{{ sale.description }}</h3>
+    
+    <a href="{% url 'sales:new_item' view.kwargs.sale_id %}" class="btn btn-primary my-5">Novo Item</a>
 
+    {% if items %}
     <table class="table">
         <thead class="thead-dark">
             <th>Descrição</th>
@@ -13,21 +16,26 @@
             <th>Ações</th>
         </thead>
         <tbody>
-            {% for item in sale.items.all %}
+            {% for item in items.with_total %}
                 <tr>
                     <td>{{ item.description }}</td>
-                    <td>{{ item.quantity }}</td>
-                    <td>{{ item.unit_price }}</td>
-                    <td>{{ item.total_value }}</td>
+                    <td>{{ item.quantity|floatformat:"-2" }}</td>
+                    <td>R$ {{ item.unit_price|floatformat:2 }}</td>
+                    <td>R$ {{ item.total|floatformat:2 }}</td>
                     <td>
                         <div class="row">
-                            <a href="{% url 'sales:update_item' item.id %}" class="btn btn-primary mr-2">Editar</a>
-                            <a href="{% url 'sales:delete_item' item.id %}" class="btn btn-danger js-load-form">Excluir</a>
+                            <a href="{% url 'sales:update_item' sale.id item.id %}" class="btn btn-primary mr-2">Editar</a>
+                            <a href="{% url 'sales:delete_item' sale.id item.id %}" class="btn btn-danger js-load-form">Excluir</a>
                         </div>
                     </td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
+    {% else %}
+        <p class="text-center">Não há items cadastrados para esse vale.</p>
+    {% endif %}
+
+    <a href="{% url 'sales:view_account' sale.account.id %}" class="btn btn-secondary">Voltar</a>
     
 {% endblock content %}

@@ -12,7 +12,7 @@
             <p><b>Cliente: </b>{{ account.name }}</p>
             <p>
                 <b>Total: </b>
-                {{ account.total_value }}
+                {{ account.total_value|default_if_none:"R$ 0,00" }}
             </p>
         </div>
     </div>
@@ -21,21 +21,26 @@
 
     <h3 class="border-bottom border-gray my-3">Vales</h3>
 
-    <div class="row">        
-        {% for sale in account.sales.all %}
-            <div class="col-sm-6 col-md-4 mb-3">
-                <div class="card">
-                    <div class="card-body">
-                        <h4 class="card-title">{{ sale.description }}</h4>
-                        <p class="card-text">Valor: R$ {{ sale.total_value }}</p>
+    <div class="row">
+        {% if account.sales.all %}        
+            {% for sale in account.sales.all %}
+                <div class="col-sm-6 col-md-4 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">{{ sale.description }}</h4>
+                            <p class="card-text">Valor: R$ {{ sale.total_value }}</p>
+                        </div>
+                        <div class="card-footer text-center">
+                            <a href="{% url 'sales:view_sale' account.id sale.id %}" class="btn btn-secondary">Detalhar</a>
+                            <a href="{% url 'sales:update_sale' sale.id %}" class="btn btn-primary">Editar</a>
+                            <a href="{% url 'sales:delete_sale' sale.id %}" class="btn btn-danger js-load-form">Excluir</a>
+                        </div>
                     </div>
-                    <div class="card-footer text-center">
-                        <a href="{% url 'sales:view_sale' account.id sale.id %}" class="btn btn-primary">Detalhar</a>
-                        <a href="{% url 'sales:update_sale' sale.id %}" class="btn btn-primary">Editar</a>
-                    </div>
-                </div>
-            </div>    
-        {% endfor %}
-    </div>
+                </div>    
+            {% endfor %}
+        {% else %}
+            <p class="text-center">Não há vales cadastrados para cliente.</p>
+        {% endif %}
+    </div>    
      
 {% endblock content %}

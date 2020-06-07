@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import F, Sum
+from django.urls import reverse
 
 # Create your models here.
 class ClientAccount(models.Model):
@@ -33,13 +34,28 @@ class OnCreditSale(models.Model):
                         total=Sum(F('unit_price') * F('quantity'),
                         output_field=models.DecimalField(decimal_places=2))
                       )
+
         payments_total = Payment.objects.filter(sale_id=self.id).aggregate(
                             total=Sum(F('value'),
                             output_field=models.DecimalField(decimal_places=2))
                         )
-        self.total_value = items_total['total'] - payments_total['total']
+
+        if payments_total['total'] is not None:
+            self.total_value = items_total['total'] - payments_total['total']
+        else:
+            self.total_value = items_total['total']    
+
+    def get_absolute_url(self):        
+        return reverse("sales:view_sale", kwargs={ "account_id": self.account.id, "sale_id": self.pk})
+    
+class SaleItemQuerySet(models.QuerySet):
+
+    def with_total(self):
+        return self.annotate(total=F('unit_price') * F('quantity'))
 
 class SaleItem(models.Model):
+    objects = SaleItemQuerySet.as_manager()
+
     sale = models.ForeignKey(OnCreditSale, on_delete=models.CASCADE, related_name='items')
     quantity = models.DecimalField(max_digits=5, decimal_places=2, blank=True)
     description = models.CharField(max_length=100)
@@ -48,7 +64,10 @@ class SaleItem(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.PROTECT)
 
     def __str__(self):
-        return self.description    
+        return self.description
+
+    # def get_total(self):
+    #     return self.quantity * self.unit_price
 
 class Payment(models.Model):
     description = models.CharField(max_length=100, blank=True)
